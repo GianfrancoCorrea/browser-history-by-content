@@ -1,0 +1,27 @@
+{
+    "manifest_version": 3,
+    "name": "Mi extensión de Chrome",
+    "version": "1.0",
+    "description": "Descripción de la extensión",
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "permissions": [
+        "history",
+        "tabs",
+        "activeTab"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content_script.js"
+            ]
+        }
+    ]
+}
