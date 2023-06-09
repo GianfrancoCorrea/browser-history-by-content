@@ -1,15 +1,12 @@
-/* 
-
-chrome.runtime.onInstalled.addListener(() => {
-    // Gets the browser's history on install.
-    chrome.history.search({ text: '', maxResults: 10 }, (historyItems) => {
-        historyItems.forEach((item) => {
-            console.log(item.url);
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+    if (msg.action === 'test') {
+        // respond to the message with the history
+        chrome.history.search({ text: '', maxResults: 10 }, (historyItems) => {
+            sendResponse({ response: historyItems });
         });
-    });
+        return true; // keep the messaging channel open for sendResponse
+    }
 });
-
-*/
 
 function getCurrentPageContent(callback) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -31,7 +28,7 @@ function getCurrentPageContent(callback) {
     });
 }
 
-getCurrentPageContent((content) => {
+/* getCurrentPageContent((content) => {
     console.log(content);
     fetch('http://127.0.0.1:5000/api/html', {
         method: 'POST',
@@ -48,4 +45,4 @@ getCurrentPageContent((content) => {
         .catch(error => {
             console.error('Error:', error);
         });
-});
+}); */
