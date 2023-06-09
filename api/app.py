@@ -74,6 +74,13 @@ def receive_html():
         title=request.form.get("title"),
     )
 
+    # TODO: send the keywords to the index service
+    data_to_index = {
+        "url": request.form.get("url"),
+        "title": request.form.get("title"),
+        "keywords": keywords,
+    }
+
     print(keywords)
 
     return keywords
