@@ -24,22 +24,21 @@ function getCurrentPageContent(callback) {
     currentWindow: true
   }, function (tabs) {
     if (tabs.length > 0) {
-      console.log('tabs length > 0');
-      var tab = tabs[0];
-      console.log('%c 🍇 tab: ', 'font-size:12px;background-color: #4b4b4b;color:#fff;', tab);
-      chrome.tabs.sendMessage(tab.id, {
-        action: 'getContent'
-      }, function (response) {
-        console.log('%c 🥜 response: ', 'font-size:12px;background-color: #FFDD4D;color:#fff;', response);
-        if (response && response.content) {
-          callback(response.content);
+      chrome.history.search({
+        text: '',
+        maxResults: 10
+      }, function (historyItems) {
+        if (historyItems) {
+          callback(historyItems);
         } else {
           callback(null);
         }
       });
+      return true;
     } else {
       callback(null);
     }
+    return true;
   });
 }
 
@@ -50,7 +49,9 @@ function getCurrentPageContent(callback) {
         body: new URLSearchParams({
             'html': content,
             'url': 'https://www.google.com',
-            'title': 'Página 2'
+            'title': 'Página 2' 
+            'urls': content
+           
         })
     })
         .then(response => response.text())
@@ -60,7 +61,8 @@ function getCurrentPageContent(callback) {
         .catch(error => {
             console.error('Error:', error);
         });
-}); */
+});
+ */
 /******/ })()
 ;
 //# sourceMappingURL=background.js.map

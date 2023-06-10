@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import Component from './Component';
-import Configuration from './Configuration';
+import Component from './components/Component';
+import Configuration from './components/Configuration';
 
 function App() {
 	const [history, setHistory] = useState([]);
