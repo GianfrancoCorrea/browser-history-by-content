@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import Component from './components/Component';
+import HistoryList from './components/HistoryList';
 import Configuration from './components/Configuration';
+import Search from './components/Search';
 
 function App() {
 	const [history, setHistory] = useState([]);
@@ -22,9 +23,9 @@ function App() {
 		<>
 			<h1>History</h1>
 			<Configuration />
-			<input type="text" placeholder='Search' />
+			<Search />
 			<div className='divider' />
-			<Component history={history} />
+			<HistoryList history={history} />
 		</>
 	);
 }

@@ -2,6 +2,7 @@ from flask import Flask, request
 from bs4 import BeautifulSoup, Comment
 import configparser
 from services.assistant import GPTAssistant
+import requests
 
 app = Flask(__name__)
 
@@ -14,76 +15,95 @@ gpt_assistant = GPTAssistant(assistant_api_key)
 
 @app.route("/api/html", methods=["POST"])
 def receive_html():
-    html_content = request.form.get("html")
-    # Beautiful Soup to parse the HTML content.
-    soup = BeautifulSoup(html_content, "html.parser")
+    url = request.form.get("url")  # Recibir la lista de URLs desde la solicitud POST
+    title = request.form.get("title")
+    id = request.form.get("id")
+    # pause execution to debug
+    input("Press Enter to continue...")
 
-    tags_p = soup.find_all("p")
-    tags_h1 = soup.find_all("h1")
-    tags_h2 = soup.find_all("h2")
-    tags_h3 = soup.find_all("h3")
-    tags_h4 = soup.find_all("h4")
-    tags_h5 = soup.find_all("h5")
-    tags_h6 = soup.find_all("h6")
-    tags_a = soup.find_all("a")
-    tags_ul = soup.find_all("ul")
-    tags_ol = soup.find_all("ol")
-    tags_li = soup.find_all("li")
-    tags_table = soup.find_all("table")
-    tags_tr = soup.find_all("tr")
-    tags_td = soup.find_all("td")
-    tags_th = soup.find_all("th")
-    tags_span = soup.find_all("span")
+    response = requests.get(url)  # Acceder a cada URL utilizando requests
 
-    combined_tags = [
-        tags_p,
-        tags_h1,
-        tags_h2,
-        tags_h3,
-        tags_h4,
-        tags_h5,
-        tags_h6,
-        tags_a,
-        tags_ul,
-        tags_ol,
-        tags_li,
-        tags_table,
-        tags_tr,
-        tags_td,
-        tags_th,
-        tags_span,
-    ]
+    if response.status_code == 200:
+        html_content = response.text
 
-    #  create a JSON object with the extracted text key = tag name, value = text
-    extracted_text = {}
-    for tag in combined_tags:
-        for t in tag:
-            text = t.text
-            text = text.replace("\n", "")
-            if t.name in extracted_text:
-                extracted_text[t.name] = extracted_text[t.name] + " | " + text
-            else:
-                extracted_text[t.name] = text
+        # Beautiful Soup para analizar el contenido HTML
+        soup = BeautifulSoup(html_content, "html.parser")
 
-    extracted_text = str(extracted_text)
+        tags = [
+            "p",
+            "h1",
+            "h2",
+            "h3",
+            "h4",
+            "h5",
+            "h6",
+            "a",
+            "ul",
+            "ol",
+            "li",
+            "table",
+            "tr",
+            "td",
+            "th",
+            "span",
+        ]
 
-    # get the url and title and sendit to the assistant
-    keywords = gpt_assistant.generate_keywords(
-        html_content=extracted_text,
-        url=request.form.get("url"),
-        title=request.form.get("title"),
-    )
+        # Remover comentarios
+        comments = soup.findAll(text=lambda text: isinstance(text, Comment))
 
-    # TODO: send the keywords to the index service
-    data_to_index = {
-        "url": request.form.get("url"),
-        "title": request.form.get("title"),
-        "keywords": keywords,
+        combined_tags = []
+        for tag in tags:
+            for match in soup.findAll(tag):
+                # match.unwrap()
+                combined_tags.append(match)
+
+        # Remover comentarios
+        for c in comments:
+            c.extract()
+
+        # Crear un objeto JSON con el texto extraído, key = nombre de la etiqueta, value = texto
+        extracted_text = {}
+        for tag in combined_tags:
+            for t in tag:
+                text = t.text
+                text = text.replace("\n", "")
+                if t.name in extracted_text:
+                    extracted_text[t.name] = extracted_text[t.name] + "|" + text
+                else:
+                    extracted_text[t.name] = text
+
+        extracted_text = str(extracted_text)
+
+        print("Pages processed: " + str(len(extracted_text)))
+
+        # Obtener la URL y el título y enviarlo al asistente
+        """ keywords = gpt_assistant.generate_keywords(
+            html_content=extracted_text,
+            url=url,
+            title="",
+        )
+        """
+
+    generated_data = {
+        "id": id,
+        "text": extracted_text,
+        "title": title,
+        "url": url,
     }
 
-    print(keywords)
+    # obtener las palabras clave del asistente y agregarlas al objeto JSON
+    # guardar en la base de datos vectorial
+    # endpoint para hacer querys a la base de datos vectorial
 
-    return keywords
+    return generated_data
+
+
+# search endpoint
+@app.route("/api/search", methods=["POST"])
+def search():
+    query = request.form.get("query")
+    print(query)
+    return query
 
 
 if __name__ == "__main__":
