@@ -2,6 +2,7 @@ from flask import Flask, request
 from bs4 import BeautifulSoup, Comment
 import configparser
 from services.assistant import GPTAssistant
+from services.pinecone_index import IndexService
 import requests
 
 app = Flask(__name__)
@@ -18,10 +19,9 @@ def receive_html():
     url = request.form.get("url")  # Recibir la lista de URLs desde la solicitud POST
     title = request.form.get("title")
     id = request.form.get("id")
-    # pause execution to debug
-    input("Press Enter to continue...")
 
     response = requests.get(url)  # Acceder a cada URL utilizando requests
+    extracted_text = {}
 
     if response.status_code == 200:
         html_content = response.text
@@ -62,7 +62,6 @@ def receive_html():
             c.extract()
 
         # Crear un objeto JSON con el texto extraído, key = nombre de la etiqueta, value = texto
-        extracted_text = {}
         for tag in combined_tags:
             for t in tag:
                 text = t.text
@@ -77,23 +76,29 @@ def receive_html():
         print("Pages processed: " + str(len(extracted_text)))
 
         # Obtener la URL y el título y enviarlo al asistente
-        """ keywords = gpt_assistant.generate_keywords(
+        keywords = gpt_assistant.generate_keywords(
             html_content=extracted_text,
             url=url,
-            title="",
+            title=title,
         )
-        """
+
+    else:
+        print("Error: " + str(response.status_code))
 
     generated_data = {
         "id": id,
-        "text": extracted_text,
-        "title": title,
         "url": url,
+        "title": title,
+        "text": extracted_text,
+        "keywords": keywords,
     }
 
-    # obtener las palabras clave del asistente y agregarlas al objeto JSON
+    # obtener las palabras clave del asistente y agregarlas al objeto JSON [done]
     # guardar en la base de datos vectorial
-    # endpoint para hacer querys a la base de datos vectorial
+    # endpoint para hacer querys a la base de datos vectorial [done]
+    # usar tiktoken para controlar el limite de tokens a GPT
+    # eliminar datos de la base de datos vectorial
+    # error handling
 
     return generated_data
 
@@ -103,7 +108,27 @@ def receive_html():
 def search():
     query = request.form.get("query")
     print(query)
-    return query
+
+    # search in pinecone
+    index = IndexService()
+    results = index.query(query)
+
+    print(results[0].page_content)
+
+    response = []
+
+    for result in results:
+        print(result.metadata)
+
+        response.append(
+            {
+                "url": result.metadata.get("source", ""),
+                "title": result.metadata.get("title", ""),
+                "keywords": result.page_content,
+            }
+        )
+
+    return response
 
 
 if __name__ == "__main__":

@@ -4,7 +4,8 @@ import configparser
 import pinecone
 import os
 from langchain.schema import Document
-import streamlit as st
+
+# import streamlit as st
 
 config = configparser.ConfigParser()
 ini_path = os.path.join(os.getcwd(), "config.ini")
@@ -58,6 +59,7 @@ class IndexService:
         return results
 
 
+""" 
 st.title("History Challenge")
 st.write("This is a demo of the History Challenge")
 
@@ -82,3 +84,4 @@ if st.button("Query"):
     index_service = IndexService()
     results = index_service.query(query)
     st.write(results)
+ """

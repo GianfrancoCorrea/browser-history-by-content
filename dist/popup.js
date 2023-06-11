@@ -2,6 +2,88 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./src/cache.js":
+/*!**********************!*\
+  !*** ./src/cache.js ***!
+  \**********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addToCache: () => (/* binding */ addToCache),
+/* harmony export */   clearCache: () => (/* binding */ clearCache),
+/* harmony export */   getFromCache: () => (/* binding */ getFromCache),
+/* harmony export */   loadLocalCache: () => (/* binding */ loadLocalCache)
+/* harmony export */ });
+var cacheSize = 10; // Tamaño máximo de la caché
+var cache = new Map(); // Diccionario para almacenar las respuestas
+var lruList = []; // Lista enlazada para realizar un seguimiento del orden de uso
+
+function loadLocalCache() {
+  chrome.storage.local.get(['cache', 'lruList'], function (result) {
+    if (result.cache) {
+      cache = new Map(result.cache);
+    }
+    if (result.lruList) {
+      lruList = result.lruList;
+    }
+    console.log('Cache loaded from local storage');
+  });
+}
+function clearLocalCache() {
+  chrome.storage.local.clear(function () {
+    console.log('Cache cleared from local storage');
+  });
+}
+function updateLocalCache() {
+  chrome.storage.local.set({
+    cache: Array.from(cache),
+    lruList: lruList
+  }, function () {
+    console.log('Cache updated in local storage');
+  });
+}
+
+// Función para agregar una entrada a la caché
+function addToCache(url, response) {
+  // Agregar la entrada al diccionario
+  cache.set(url, response);
+
+  // Agregar la entrada al frente de la lista enlazada
+  lruList.unshift(url);
+
+  // Si la lista enlazada excede el tamaño máximo, eliminar la entrada menos reciente
+  if (lruList.length > cacheSize) {
+    var removedUrl = lruList.pop();
+    cache["delete"](removedUrl);
+  }
+
+  // Actualizar el almacenamiento local
+  updateLocalCache();
+}
+function getFromCache(url) {
+  // Si la entrada existe en la caché, devolverla
+  if (cache.has(url)) {
+    return cache.get(url);
+  }
+
+  // Si la entrada no existe en la caché, devolver null
+  return null;
+}
+function clearCache() {
+  // Limpiar la caché
+  cache.clear();
+  lruList.length = 0;
+
+  // Actualizar el almacenamiento local
+  clearLocalCache();
+}
+
+// Exportar las funciones
+
+
+/***/ }),
+
 /***/ "./src/components/Configuration.js":
 /*!*****************************************!*\
   !*** ./src/components/Configuration.js ***!
@@ -60,12 +142,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../cache */ "./src/cache.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 var SyncButton = function SyncButton(_ref) {
   var history_item = _ref.history_item;
@@ -77,6 +161,11 @@ var SyncButton = function SyncButton(_ref) {
     _React$useState4 = _slicedToArray(_React$useState3, 2),
     sync = _React$useState4[0],
     setSync = _React$useState4[1];
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    if ((0,_cache__WEBPACK_IMPORTED_MODULE_1__.getFromCache)(history_item.url) !== null) {
+      setSync(true);
+    }
+  }, [history_item.url]);
   var fetchAPI = function fetchAPI(history_item) {
     return fetch('http://127.0.0.1:5000/api/html', {
       method: 'POST',
@@ -88,17 +177,21 @@ var SyncButton = function SyncButton(_ref) {
     }).then(function (response) {
       return response.text();
     }).then(function (data) {
-      console.log(data);
+      return data;
     })["catch"](function (error) {
       console.error('Error:', error);
     });
   };
   var handleClick = function handleClick() {
-    setLoading(true);
-    fetchAPI(history_item).then(function () {
-      setLoading(false);
-      setSync(true);
-    });
+    if ((0,_cache__WEBPACK_IMPORTED_MODULE_1__.getFromCache)(history_item.url) === null) {
+      setLoading(true);
+      fetchAPI(history_item).then(function (data) {
+        setLoading(false);
+        setSync(true);
+        console.log('%c 🍩 data: ', 'font-size:12px;background-color: #ED9EC7;color:#fff;', data);
+        (0,_cache__WEBPACK_IMPORTED_MODULE_1__.addToCache)(history_item.url, data);
+      });
+    }
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, loading & !sync ? /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
     className: "sync",
@@ -117,6 +210,9 @@ var SyncButton = function SyncButton(_ref) {
   }, "\u2705") : null);
 };
 function HistoryList(props) {
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    (0,_cache__WEBPACK_IMPORTED_MODULE_1__.loadLocalCache)();
+  }, []);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("ul", null, props.history.map(function (item, index) {
     var formatedDate = new Date(item.lastVisitTime).toLocaleString();
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", {

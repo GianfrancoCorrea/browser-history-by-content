@@ -1,10 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { addToCache, getFromCache, loadLocalCache } from '../cache'
 
 
 const SyncButton = ({ history_item }) => {
 
     const [loading, setLoading] = React.useState(false)
     const [sync, setSync] = React.useState(false)
+
+    useEffect(() => {
+        if (getFromCache(history_item.url) !== null) {
+            setSync(true)
+        }
+    }, [history_item.url])
 
     const fetchAPI = (history_item) => {
         return fetch('http://127.0.0.1:5000/api/html', {
@@ -17,7 +24,7 @@ const SyncButton = ({ history_item }) => {
         })
             .then(response => response.text())
             .then(data => {
-                console.log(data);
+                return data
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -25,11 +32,15 @@ const SyncButton = ({ history_item }) => {
     }
 
     const handleClick = () => {
-        setLoading(true)
-        fetchAPI(history_item).then(() => {
-            setLoading(false)
-            setSync(true)
-        })
+        if (getFromCache(history_item.url) === null) {
+            setLoading(true)
+            fetchAPI(history_item).then((data) => {
+                setLoading(false)
+                setSync(true)
+                console.log('%c 🍩 data: ', 'font-size:12px;background-color: #ED9EC7;color:#fff;', data);
+                addToCache(history_item.url, data)
+            })
+        }
     }
 
 
@@ -45,7 +56,9 @@ const SyncButton = ({ history_item }) => {
 
 function HistoryList(props) {
 
-
+    useEffect(() => {
+        loadLocalCache()
+    }, [])
 
     return (
         <ul>
