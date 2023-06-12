@@ -3,17 +3,21 @@ import { createRoot } from 'react-dom/client';
 import HistoryList from './components/HistoryList';
 import Configuration from './components/Configuration';
 import Search from './components/Search';
+import { clearHistoryAPI } from './api/apiService';
+import { clearCache, loadLocalCache } from './cache';
 
 function App() {
 	const [history, setHistory] = useState([]);
 	const [searchResults, setSearchResults] = useState(null);
 
 	useEffect(() => {
-		// connect with background.js
-		chrome.runtime.connect({ name: "popup" });
-		chrome.runtime.sendMessage({ message: "Hola desde el popup", action: 'test' }, (response) => {
+		loadLocalCache()
+	}, [])
+
+
+	useEffect(() => {
+		chrome.runtime.sendMessage({ action: 'getHistory' }, (response) => {
 			if (response) {
-				console.log(response.response)
 				setHistory(response.response)
 			}
 		});
@@ -21,13 +25,22 @@ function App() {
 	}, []);
 
 	const handleSearch = (results) => {
+		console.log('%c 🍛 results: ', 'font-size:12px;background-color: #B03734;color:#fff;', results);
 		setSearchResults(results);
 	};
+
+	const handleClear = () => {
+		return clearHistoryAPI().then(() => {
+			clearCache()
+		})
+	}
+
 
 	return (
 		<>
 			<h1>History</h1>
 			<Configuration />
+			<button onClick={handleClear}>Clear DB & cache</button>
 			<Search onSearch={handleSearch} />
 			<div className='divider' />
 			<HistoryList history={history} searchResults={searchResults} />

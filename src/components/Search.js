@@ -1,25 +1,14 @@
 import React from 'react';
+import { searchHistoryAPI } from '../api/apiService';
 
 function Search({ onSearch }) {
 
-
     const handleSubmit = (e) => {
         if (e.key === 'Enter') {
-            console.log(e.target.value)
-            fetch('http://127.0.0.1:5000/api/search', {
-                method: 'POST',
-                body: new URLSearchParams({
-                    'query': e.target.value,
-                })
+            searchHistoryAPI(e.target.value).then((data) => {
+                data = JSON.parse(data)
+                onSearch(data)
             })
-                .then(response => response.text())
-                .then(data => {
-                    data = JSON.parse(data);
-                    onSearch(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
         }
     }
 
