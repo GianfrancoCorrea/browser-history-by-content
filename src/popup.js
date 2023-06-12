@@ -6,6 +6,7 @@ import Search from './components/Search';
 
 function App() {
 	const [history, setHistory] = useState([]);
+	const [searchResults, setSearchResults] = useState(null);
 
 	useEffect(() => {
 		// connect with background.js
@@ -19,13 +20,17 @@ function App() {
 
 	}, []);
 
+	const handleSearch = (results) => {
+		setSearchResults(results);
+	};
+
 	return (
 		<>
 			<h1>History</h1>
 			<Configuration />
-			<Search />
+			<Search onSearch={handleSearch} />
 			<div className='divider' />
-			<HistoryList history={history} />
+			<HistoryList history={history} searchResults={searchResults} />
 		</>
 	);
 }

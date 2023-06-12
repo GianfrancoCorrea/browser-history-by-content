@@ -1,6 +1,6 @@
 import React from 'react';
 
-function Search() {
+function Search({ onSearch }) {
 
 
     const handleSubmit = (e) => {
@@ -14,7 +14,8 @@ function Search() {
             })
                 .then(response => response.text())
                 .then(data => {
-                    console.log(data);
+                    data = JSON.parse(data);
+                    onSearch(data);
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -22,11 +23,16 @@ function Search() {
         }
     }
 
+    const handleChange = (e) => {
+        if (e.target.value === '') {
+            onSearch(null);
+        }
+    }
 
 
     return (
         <div className='search'>
-            <input type="text" placeholder='Search' onKeyDown={handleSubmit} />
+            <input type="text" placeholder='Search' onKeyDown={handleSubmit} onChange={handleChange} />
         </div>
     )
 }
