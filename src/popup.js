@@ -10,19 +10,20 @@ function App() {
 	const [history, setHistory] = useState([]);
 	const [searchResults, setSearchResults] = useState(null);
 
-	useEffect(() => {
+	const setInitialState = () => {
+		// Load cache and get chrome history
 		loadLocalCache()
-	}, [])
-
-
-	useEffect(() => {
 		chrome.runtime.sendMessage({ action: 'getHistory' }, (response) => {
 			if (response) {
 				setHistory(response.response)
 			}
 		});
+	}
 
-	}, []);
+	// on mount
+	useEffect(() => {
+		setInitialState()
+	}, [])
 
 	const handleSearch = (results) => {
 		console.log('%c 🍛 results: ', 'font-size:12px;background-color: #B03734;color:#fff;', results);

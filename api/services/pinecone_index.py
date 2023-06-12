@@ -1,9 +1,9 @@
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.vectorstores import Pinecone
+from langchain.schema import Document
 import configparser
 import pinecone
 import os
-from langchain.schema import Document
 
 
 config = configparser.ConfigParser()
@@ -12,8 +12,6 @@ config.read(ini_path)
 
 PINECONE_API_KEY = config["DEFAULT"]["PINECONE_API_KEY"]
 PINECONE_ENV = config["DEFAULT"]["PINECONE_ENV"]
-API_KEY = config["DEFAULT"]["API-KEY"]
-os.environ["OPENAI_API_KEY"] = API_KEY
 
 
 class IndexService:
@@ -34,7 +32,7 @@ class IndexService:
             metadata={
                 "source": data["url"],
                 "title": data["title"],
-            },  # TODO: return keywords
+            },
         )
         documents.append(document)
 

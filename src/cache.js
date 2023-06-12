@@ -69,4 +69,3 @@ function clearCache() {
 
 // Exportar las funciones
 export { addToCache, getFromCache, clearCache, loadLocalCache };
-

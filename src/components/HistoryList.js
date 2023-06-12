@@ -27,7 +27,6 @@ function HistoryList({ history, searchResults }) {
                     )
                 })
                 : searchResults?.map((item, index) => {
-                    // const formatedDate = new Date(item.lastVisitTime).toLocaleString()
                     return (
                         <li key={index}>
                             <div className='text-container' style={{ maxWidth: '90%', overflow: 'hidden' }}>
@@ -35,9 +34,9 @@ function HistoryList({ history, searchResults }) {
                                 <div>
                                     <span className='text-small'>{item.url}</span>
                                 </div>
-                                {/* <div>
-                                <span className='text-small'>{formatedDate}</span>
-                            </div> */}
+                                <div>
+                                    <span className='text-small'>{item.keywords}</span>
+                                </div>
                             </div>
                             <div>
                                 <SyncButton history_item={item} />

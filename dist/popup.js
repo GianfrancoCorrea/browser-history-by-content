@@ -216,7 +216,6 @@ function HistoryList(_ref) {
       history_item: item
     })));
   }) : searchResults === null || searchResults === void 0 ? void 0 : searchResults.map(function (item, index) {
-    // const formatedDate = new Date(item.lastVisitTime).toLocaleString()
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", {
       key: index
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
@@ -227,7 +226,9 @@ function HistoryList(_ref) {
       }
     }, item.title, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
       className: "text-small"
-    }, item.url))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_SyncButton__WEBPACK_IMPORTED_MODULE_1__["default"], {
+    }, item.url)), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
+      className: "text-small"
+    }, item.keywords))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_SyncButton__WEBPACK_IMPORTED_MODULE_1__["default"], {
       history_item: item
     })));
   }));
@@ -33836,10 +33837,9 @@ function App() {
     _useState4 = _slicedToArray(_useState3, 2),
     searchResults = _useState4[0],
     setSearchResults = _useState4[1];
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+  var setInitialState = function setInitialState() {
+    // Load cache and get chrome history
     (0,_cache__WEBPACK_IMPORTED_MODULE_6__.loadLocalCache)();
-  }, []);
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     chrome.runtime.sendMessage({
       action: 'getHistory'
     }, function (response) {
@@ -33847,6 +33847,11 @@ function App() {
         setHistory(response.response);
       }
     });
+  };
+
+  // on mount
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    setInitialState();
   }, []);
   var handleSearch = function handleSearch(results) {
     console.log('%c 🍛 results: ', 'font-size:12px;background-color: #B03734;color:#fff;', results);
