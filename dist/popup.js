@@ -167,7 +167,7 @@ var SyncButton = function SyncButton(_ref) {
     }
   }, [history_item.url]);
   var fetchAPI = function fetchAPI(history_item) {
-    return fetch('http://127.0.0.1:5000/api/html', {
+    return fetch('http://127.0.0.1:5000/api/add', {
       method: 'POST',
       body: new URLSearchParams({
         id: history_item.id,
@@ -213,7 +213,19 @@ function HistoryList(props) {
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     (0,_cache__WEBPACK_IMPORTED_MODULE_1__.loadLocalCache)();
   }, []);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("ul", null, props.history.map(function (item, index) {
+  var handleClear = function handleClear() {
+    return fetch('http://127.0.0.1:5000/api/clear', {
+      method: 'DELETE'
+    }).then(function (data) {
+      console.log(data);
+      (0,_cache__WEBPACK_IMPORTED_MODULE_1__.clearCache)();
+    })["catch"](function (error) {
+      console.error('Error:', error);
+    });
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("ul", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+    onClick: handleClear
+  }, "Clear DB & cache"), props.history.map(function (item, index) {
     var formatedDate = new Date(item.lastVisitTime).toLocaleString();
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", {
       key: index

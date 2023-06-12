@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { addToCache, getFromCache, loadLocalCache } from '../cache'
+import { addToCache, getFromCache, loadLocalCache, clearCache } from '../cache'
 
 
 const SyncButton = ({ history_item }) => {
@@ -14,7 +14,7 @@ const SyncButton = ({ history_item }) => {
     }, [history_item.url])
 
     const fetchAPI = (history_item) => {
-        return fetch('http://127.0.0.1:5000/api/html', {
+        return fetch('http://127.0.0.1:5000/api/add', {
             method: 'POST',
             body: new URLSearchParams({
                 id: history_item.id,
@@ -60,8 +60,22 @@ function HistoryList(props) {
         loadLocalCache()
     }, [])
 
+    const handleClear = () => {
+        return fetch('http://127.0.0.1:5000/api/clear', {
+            method: 'DELETE',
+        })
+            .then(data => {
+                console.log(data)
+                clearCache()
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
     return (
         <ul>
+            <button onClick={handleClear}>Clear DB & cache</button>
             {props.history.map((item, index) => {
                 const formatedDate = new Date(item.lastVisitTime).toLocaleString()
                 return (
