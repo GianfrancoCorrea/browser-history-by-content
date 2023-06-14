@@ -14,8 +14,8 @@ function HistoryList({ history, searchResults }) {
                 history.map((item, index) => {
                     const formatedDate = new Date(item.lastVisitTime).toLocaleString()
                     return (
-                        <li key={index} onClick={() => handleClick(item.url)}>
-                            <div className='text-container' style={{ maxWidth: '90%', overflow: 'hidden' }}>
+                        <li key={index} >
+                            <div className='text-container' style={{ maxWidth: '90%', overflow: 'hidden' }} onClick={() => handleClick(item.url)} >
                                 {item.title}
                                 <div>
                                     <span className='text-small'>{item.url}</span>
@@ -32,8 +32,8 @@ function HistoryList({ history, searchResults }) {
                 })
                 : searchResults?.map((item, index) => {
                     return (
-                        <li key={index} onClick={() => handleClick(item.url)}>
-                            <div className='text-container' style={{ maxWidth: '90%', overflow: 'hidden' }}>
+                        <li key={index}>
+                            <div className='text-container' style={{ maxWidth: '90%', overflow: 'hidden' }} onClick={() => handleClick(item.url)} >
                                 {item.title}
                                 <div>
                                     <span className='text-small'>{item.url}</span>

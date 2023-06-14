@@ -138,15 +138,15 @@ function HistoryList(_ref) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("ul", null, !searchResults ? history.map(function (item, index) {
     var formatedDate = new Date(item.lastVisitTime).toLocaleString();
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", {
-      key: index,
-      onClick: function onClick() {
-        return handleClick(item.url);
-      }
+      key: index
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "text-container",
       style: {
         maxWidth: '90%',
         overflow: 'hidden'
+      },
+      onClick: function onClick() {
+        return handleClick(item.url);
       }
     }, item.title, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
       className: "text-small"
@@ -157,15 +157,15 @@ function HistoryList(_ref) {
     })));
   }) : searchResults === null || searchResults === void 0 ? void 0 : searchResults.map(function (item, index) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", {
-      key: index,
-      onClick: function onClick() {
-        return handleClick(item.url);
-      }
+      key: index
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "text-container",
       style: {
         maxWidth: '90%',
         overflow: 'hidden'
+      },
+      onClick: function onClick() {
+        return handleClick(item.url);
       }
     }, item.title, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("span", {
       className: "text-small"
