@@ -1,5 +1,5 @@
 from flask import Flask, request
-from bs4 import BeautifulSoup, Comment
+from bs4 import BeautifulSoup
 import configparser
 from services.assistant import GPTAssistant
 from services.pinecone_index import IndexService
@@ -48,16 +48,10 @@ def receive_html():
             "span",
         ]
 
-        comments = soup.findAll(text=lambda text: isinstance(text, Comment))
-
         combined_tags = []
         for tag in tags:
             for match in soup.findAll(tag):
                 combined_tags.append(match)
-
-        # remove comments
-        for c in comments:
-            c.extract()
 
         # Create a JSON object with the extracted text, key = tag name, value = text.
         for tag in combined_tags:
@@ -104,9 +98,9 @@ def receive_html():
 
 
 # search endpoint
-@app.route("/api/search", methods=["POST"])
+@app.route("/api/search", methods=["GET"])
 def search():
-    query = request.form.get("query")
+    query = request.args.get("query")
     print(query)
 
     # search in pinecone

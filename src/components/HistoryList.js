@@ -4,13 +4,17 @@ import SyncButton from './SyncButton'
 
 function HistoryList({ history, searchResults }) {
 
+    const handleClick = (url) => {
+        chrome.tabs.create({ url: url });
+    }
+
     return (
         <ul>
             {!searchResults ?
                 history.map((item, index) => {
                     const formatedDate = new Date(item.lastVisitTime).toLocaleString()
                     return (
-                        <li key={index}>
+                        <li key={index} onClick={() => handleClick(item.url)}>
                             <div className='text-container' style={{ maxWidth: '90%', overflow: 'hidden' }}>
                                 {item.title}
                                 <div>
@@ -28,7 +32,7 @@ function HistoryList({ history, searchResults }) {
                 })
                 : searchResults?.map((item, index) => {
                     return (
-                        <li key={index}>
+                        <li key={index} onClick={() => handleClick(item.url)}>
                             <div className='text-container' style={{ maxWidth: '90%', overflow: 'hidden' }}>
                                 {item.title}
                                 <div>

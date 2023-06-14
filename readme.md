@@ -77,3 +77,4 @@ Run the development server:
 
 ![Extension](/readme/Screenshot_1.png "Extension")
 ![Search](/readme/Screenshot_2.png "Search")
+![Flow](/readme/flow4.png "Flow")

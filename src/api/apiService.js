@@ -10,12 +10,9 @@ export const addHistoryAPI = (params) => fetch(API_URL('add'), {
         console.error('Error:', error);
     });
 
-export const searchHistoryAPI = (params) => fetch(API_URL('search'), {
-    method: 'POST', // TODO: make get request
-    body: new URLSearchParams({
-        'query': params,
-    })
-})
+export const searchHistoryAPI = (params) => fetch(API_URL('search') + '?' + new URLSearchParams({
+    'query': params,
+}))
     .then(response => response.text())
     .catch(error => {
         console.error('Error:', error);

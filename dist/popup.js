@@ -28,13 +28,9 @@ var addHistoryAPI = function addHistoryAPI(params) {
   });
 };
 var searchHistoryAPI = function searchHistoryAPI(params) {
-  return fetch(API_URL('search'), {
-    method: 'POST',
-    // TODO: make get request
-    body: new URLSearchParams({
-      'query': params
-    })
-  }).then(function (response) {
+  return fetch(API_URL('search') + '?' + new URLSearchParams({
+    'query': params
+  })).then(function (response) {
     return response.text();
   })["catch"](function (error) {
     console.error('Error:', error);
@@ -65,10 +61,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   getFromCache: () => (/* binding */ getFromCache),
 /* harmony export */   loadLocalCache: () => (/* binding */ loadLocalCache)
 /* harmony export */ });
-var cacheSize = 10; // Tamaño máximo de la caché
-var cache = new Map(); // Diccionario para almacenar las respuestas
-var lruList = []; // Lista enlazada para realizar un seguimiento del orden de uso
-
+var cacheSize = 10;
+var cache = new Map();
+var lruList = [];
 function loadLocalCache() {
   chrome.storage.local.get(['cache', 'lruList'], function (result) {
     if (result.cache) {
@@ -93,90 +88,27 @@ function updateLocalCache() {
     console.log('Cache updated in local storage');
   });
 }
-
-// Función para agregar una entrada a la caché
 function addToCache(url, response) {
-  // Agregar la entrada al diccionario
   cache.set(url, response);
-
-  // Agregar la entrada al frente de la lista enlazada
   lruList.unshift(url);
-
-  // Si la lista enlazada excede el tamaño máximo, eliminar la entrada menos reciente
   if (lruList.length > cacheSize) {
     var removedUrl = lruList.pop();
     cache["delete"](removedUrl);
   }
-
-  // Actualizar el almacenamiento local
   updateLocalCache();
 }
 function getFromCache(url) {
-  // Si la entrada existe en la caché, devolverla
   if (cache.has(url)) {
     return cache.get(url);
   }
-
-  // Si la entrada no existe en la caché, devolver null
   return null;
 }
 function clearCache() {
-  // Limpiar la caché
   cache.clear();
   lruList.length = 0;
-
-  // Actualizar el almacenamiento local
   clearLocalCache();
 }
 
-// Exportar las funciones
-
-
-/***/ }),
-
-/***/ "./src/components/Configuration.js":
-/*!*****************************************!*\
-  !*** ./src/components/Configuration.js ***!
-  \*****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-function Configuration() {
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false),
-    _useState2 = _slicedToArray(_useState, 2),
-    panelOpen = _useState2[0],
-    setPanelOpen = _useState2[1];
-
-  // add a button to open the configuration page
-  var Button = function Button() {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
-      onClick: function onClick() {
-        setPanelOpen(!panelOpen);
-      }
-    }, "Config");
-  };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(Button, null), panelOpen && /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "panel"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
-    className: "close",
-    onClick: function onClick() {
-      setPanelOpen(!panelOpen);
-    }
-  }, "X"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h1", null, "Configuration"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("p", null, "Some configuration options")));
-}
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (Configuration);
 
 /***/ }),
 
@@ -198,10 +130,18 @@ __webpack_require__.r(__webpack_exports__);
 function HistoryList(_ref) {
   var history = _ref.history,
     searchResults = _ref.searchResults;
+  var handleClick = function handleClick(url) {
+    chrome.tabs.create({
+      url: url
+    });
+  };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("ul", null, !searchResults ? history.map(function (item, index) {
     var formatedDate = new Date(item.lastVisitTime).toLocaleString();
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", {
-      key: index
+      key: index,
+      onClick: function onClick() {
+        return handleClick(item.url);
+      }
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "text-container",
       style: {
@@ -217,7 +157,10 @@ function HistoryList(_ref) {
     })));
   }) : searchResults === null || searchResults === void 0 ? void 0 : searchResults.map(function (item, index) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("li", {
-      key: index
+      key: index,
+      onClick: function onClick() {
+        return handleClick(item.url);
+      }
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
       className: "text-container",
       style: {
@@ -33811,17 +33754,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var _components_HistoryList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./components/HistoryList */ "./src/components/HistoryList.js");
-/* harmony import */ var _components_Configuration__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/Configuration */ "./src/components/Configuration.js");
-/* harmony import */ var _components_Search__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components/Search */ "./src/components/Search.js");
-/* harmony import */ var _api_apiService__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./api/apiService */ "./src/api/apiService.js");
-/* harmony import */ var _cache__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./cache */ "./src/cache.js");
+/* harmony import */ var _components_Search__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./components/Search */ "./src/components/Search.js");
+/* harmony import */ var _api_apiService__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./api/apiService */ "./src/api/apiService.js");
+/* harmony import */ var _cache__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./cache */ "./src/cache.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
 
 
 
@@ -33839,7 +33780,7 @@ function App() {
     setSearchResults = _useState4[1];
   var setInitialState = function setInitialState() {
     // Load cache and get chrome history
-    (0,_cache__WEBPACK_IMPORTED_MODULE_6__.loadLocalCache)();
+    (0,_cache__WEBPACK_IMPORTED_MODULE_5__.loadLocalCache)();
     chrome.runtime.sendMessage({
       action: 'getHistory'
     }, function (response) {
@@ -33858,13 +33799,13 @@ function App() {
     setSearchResults(results);
   };
   var handleClear = function handleClear() {
-    return (0,_api_apiService__WEBPACK_IMPORTED_MODULE_5__.clearHistoryAPI)().then(function () {
-      (0,_cache__WEBPACK_IMPORTED_MODULE_6__.clearCache)();
+    return (0,_api_apiService__WEBPACK_IMPORTED_MODULE_4__.clearHistoryAPI)().then(function () {
+      (0,_cache__WEBPACK_IMPORTED_MODULE_5__.clearCache)();
     });
   };
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h1", null, "History"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Configuration__WEBPACK_IMPORTED_MODULE_3__["default"], null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("h1", null, "History"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("button", {
     onClick: handleClear
-  }, "Clear DB & cache"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Search__WEBPACK_IMPORTED_MODULE_4__["default"], {
+  }, "Clear DB & cache"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components_Search__WEBPACK_IMPORTED_MODULE_3__["default"], {
     onSearch: handleSearch
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("div", {
     className: "divider"
